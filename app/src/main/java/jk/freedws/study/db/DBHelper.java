@@ -14,15 +14,15 @@ import java.io.OutputStream;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static String DB_PATH;
-    private static String DB_NAME = "database.db";
+    private final static String DB_NAME = "database.db";
     private static final int SCHEMA = 1;
     public static final String TABLE = "definitions";
     // названия столбцов
-    static final String COLUMN_ID = "_id";
+    public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_DEFINITION = "definition";
-    static final String COLUMN_FAVORITE = "favorite";
-    private Context myContext;
+    public static final String COLUMN_FAVORITE = "favorite";
+    private final Context myContext;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, SCHEMA);

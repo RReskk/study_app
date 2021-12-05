@@ -54,7 +54,7 @@ public class MainFragment extends Fragment {
         });
 
         dbHelper = new DBHelper(context);
-        // создаем базу данных
+
         dbHelper.create_db();
 
         return v;
