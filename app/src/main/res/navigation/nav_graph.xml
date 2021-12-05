@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="jk.freedws.study.MainFragment"
+        android:name="jk.freedws.study.fragments.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="jk.freedws.study.SearchFragment"
+        android:name="jk.freedws.study.fragments.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment
         android:id="@+id/favoriteFragment"
-        android:name="jk.freedws.study.FavoriteFragment"
+        android:name="jk.freedws.study.fragments.FavoriteFragment"
         android:label="fragment_favorite"
         tools:layout="@layout/fragment_favorite" />
 </navigation>

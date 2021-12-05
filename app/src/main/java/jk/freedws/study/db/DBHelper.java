@@ -1,4 +1,4 @@
-package jk.freedws.study;
+package jk.freedws.study.db;
 
 import android.database.SQLException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -12,19 +12,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-class DBHelper extends SQLiteOpenHelper {
+public class DBHelper extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_NAME = "database.db";
     private static final int SCHEMA = 1;
-    static final String TABLE = "definitions";
+    public static final String TABLE = "definitions";
     // названия столбцов
     static final String COLUMN_ID = "_id";
-    static final String COLUMN_NAME = "name";
-    static final String COLUMN_DEFINITION = "definition";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_DEFINITION = "definition";
     static final String COLUMN_FAVORITE = "favorite";
     private Context myContext;
 
-    DBHelper(Context context) {
+    public DBHelper(Context context) {
         super(context, DB_NAME, null, SCHEMA);
         this.myContext=context;
         DB_PATH =context.getFilesDir().getPath() + DB_NAME;
@@ -35,7 +35,7 @@ class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion,  int newVersion) { }
 
-    void create_db(){
+    public void create_db(){
 
         File file = new File(DB_PATH);
         if (!file.exists()) {
