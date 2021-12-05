@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,59 +17,76 @@ import jk.freedws.study.db.DBHelper;
 
 public class ItemActivity extends AppCompatActivity {
 
-    ImageView star;
     TextView textView;
-    public boolean favorite = false;
-
+    ImageView star;
     DBHelper sqlHelper;
     SQLiteDatabase db;
     Cursor userCursor;
-    long Id=10;
+    long userId=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        changeActionBar();
         setContentView(R.layout.activity_item);
+        changeActionBar();
 
+        textView = findViewById(R.id.item__definition_text);
+        star = findViewById(R.id.imageStar);
         sqlHelper = new DBHelper(this);
-        sqlHelper.create_db();
+        db = sqlHelper.open();
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            Id = extras.getLong("id");
+            userId = extras.getLong("id");
         }
-
-        if (Id > 0) {
+        // если 0, то добавление
+        if (userId > 0) {
             // получаем элемент по id из бд
-            userCursor = db.rawQuery("select * from definitions where " +
-                    DBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(Id)});
+            userCursor = db.rawQuery("select * from " + DBHelper.TABLE + " where " +
+                    DBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(userId)});
             userCursor.moveToFirst();
-            textView.setText(userCursor.getString(3));
+            textView.setText(userCursor.getString(2));
+
+            starChange(userCursor.getString(3));
+
             userCursor.close();
-        } else {
-            // скрываем кнопку удаления
         }
 
         star.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                star.setImageResource(R.drawable.ic_baseline_star_24);
+                addFav();
             }
         });
-
     }
 
-//    public void saveClicke(View view){
+    private void starChange(String isTrue) {
+        if (isTrue == "true") {
+            star.setImageResource(R.drawable.ic_baseline_star_24);
+        } else {
+            star.setImageResource(R.drawable.ic_baseline_star_border_24);
+        }
+    }
+
+    public void addFav(){
+//        if (!db.isOpen())
+//            db = sqlHelper.open();
+//
 //        ContentValues cv = new ContentValues();
-//        cv.put(DBHelper.COLUMN_FAVORITE, true);
+//
+//        if (userCursor.getString(3) == "true") {
+//            cv.put(DBHelper.COLUMN_FAVORITE, "false");
+//            starChange("false");
+//        } else {
+//            cv.put(DBHelper.COLUMN_FAVORITE, "true");
+//            starChange("true");
+//        }
 //
 //        if (userId > 0) {
-//            db.update(DatabaseHelper.TABLE, cv, DatabaseHelper.COLUMN_ID + "=" + userId, null);
-//        } else {
-//            db.insert(DatabaseHelper.TABLE, null, cv);
+//            db.update(DBHelper.TABLE, cv, DBHelper.COLUMN_ID + "=" + userId, null);
 //        }
-//        goHome();
-//    }
+//
+//        db.close();
+    }
 
     private void changeActionBar() {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);

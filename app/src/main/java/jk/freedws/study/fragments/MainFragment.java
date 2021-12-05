@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +32,16 @@ public class MainFragment extends Fragment {
     SimpleCursorAdapter userAdapter;
     Context context;
 
+    Parcelable state;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if(state != null) {
+            userList.onRestoreInstanceState(state);
+        }
 
 
         TextView title = getActivity().findViewById(R.id.actionbar_title);
@@ -49,6 +57,7 @@ public class MainFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(context, ItemActivity.class);
                 intent.putExtra("id", id);
+                state = userList.onSaveInstanceState();
                 startActivity(intent);
             }
         });
@@ -60,7 +69,6 @@ public class MainFragment extends Fragment {
         return v;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -70,6 +78,9 @@ public class MainFragment extends Fragment {
         userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
                 userCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
         userList.setAdapter(userAdapter);
+        if(state != null) {
+            userList.onRestoreInstanceState(state);
+        }
     }
 
 
