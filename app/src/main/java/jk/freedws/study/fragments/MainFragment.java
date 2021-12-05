@@ -1,6 +1,7 @@
 package jk.freedws.study.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import jk.freedws.study.ItemActivity;
 import jk.freedws.study.R;
 import jk.freedws.study.db.DBHelper;
 
@@ -45,10 +47,9 @@ public class MainFragment extends Fragment {
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-//                intent.putExtra("id", id);
-//                startActivity(intent);
-                Toast.makeText(context, "clicked" + id, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(context, ItemActivity.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
             }
         });
 
@@ -63,13 +64,9 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // открываем подключение
         db = dbHelper.open();
-        //получаем данные из бд в виде курсора
         userCursor = db.rawQuery("select * from " + DBHelper.TABLE, null);
-        // определяем, какие столбцы из курсора будут выводиться в ListView
         String[] headers = new String[]{DBHelper.COLUMN_NAME};
-        // создаем адаптер, передаем в него курсор
         userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
                 userCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
         userList.setAdapter(userAdapter);
@@ -79,7 +76,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Закрываем подключение и курсор
         db.close();
         userCursor.close();
     }
