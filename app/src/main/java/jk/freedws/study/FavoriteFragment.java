@@ -61,6 +61,8 @@ public class FavoriteFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_favorite, container, false);
+        TextView title = getActivity().findViewById(R.id.actionbar_title);
+        title.setText("Избранное");
         return v;
     }
 }

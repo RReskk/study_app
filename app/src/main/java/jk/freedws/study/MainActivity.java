@@ -18,7 +18,6 @@ import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView action_bar_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +25,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         setContentView(R.layout.activity_main);
-        action_bar_text = findViewById(R.id.actionbar_title);
-        action_bar_text.setText("Обществознание");
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_menu);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
