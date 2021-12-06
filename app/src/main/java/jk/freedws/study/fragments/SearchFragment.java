@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,6 +37,7 @@ public class SearchFragment extends Fragment {
     SQLiteDatabase db;
     Cursor userCursor;
     SimpleCursorAdapter userAdapter;
+    Handler handler;
 
     Parcelable state;
 
@@ -52,6 +54,8 @@ public class SearchFragment extends Fragment {
 
         dbHelper = new DBHelper(context);
         dbHelper.create_db();
+
+
 
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -107,14 +111,7 @@ public class SearchFragment extends Fragment {
                 public Cursor runQuery(CharSequence constraint) {
 
                     if (constraint == null || constraint.length() == 0) {
-                        if (db != null) {
-                            db.close();
-                        }
-                        if (userCursor != null) {
-                            userCursor.close();
-                        }
-
-                        return db.rawQuery("select * from " + DBHelper.TABLE, new String[]{"null"});
+                        return db.rawQuery("select * from " + DBHelper.TABLE + " where " +DBHelper.COLUMN_ID +" =? ", new String[]{"0"});
                     }
                     else {
                         return db.rawQuery("select * from " + DBHelper.TABLE + " where " +
@@ -127,6 +124,7 @@ public class SearchFragment extends Fragment {
         }
         catch (SQLException ex){}
     }
+
 
     @Override
     public void onDestroy() {

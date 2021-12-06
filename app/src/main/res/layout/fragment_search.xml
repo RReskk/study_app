@@ -14,7 +14,7 @@
         android:background="@drawable/search_element"
         android:drawableLeft="@drawable/ic_baseline_search_24"
         android:hint="Поиск"
-        android:inputType="text"
+        android:inputType="textNoSuggestions"
         android:maxLength="30"
         android:maxLines="1"
         android:padding="5sp"
