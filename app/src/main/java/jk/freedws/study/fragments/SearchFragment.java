@@ -132,6 +132,20 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if(state != null) {
+            userList.onRestoreInstanceState(state);
+        }
+    }
 
+    @Override
+    public void onDestroy() {
+        state = userList.onSaveInstanceState();
+        super.onDestroy();
+        if (db != null) {
+            db.close();
+        }
+        if (userCursor != null) {
+            userCursor.close();
+        }
     }
 }
