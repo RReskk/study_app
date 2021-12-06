@@ -8,11 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import jk.freedws.study.db.DBHelper;
 
@@ -22,8 +19,8 @@ public class ItemActivity extends AppCompatActivity {
     ImageView star;
     DBHelper sqlHelper;
     SQLiteDatabase db;
-    Cursor userCursor;
-    long userId=0;
+    Cursor cursor;
+    long Id =0;
     Boolean isFavorite;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +35,18 @@ public class ItemActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            userId = extras.getLong("id");
+            Id = extras.getLong("id");
         }
-        // если 0, то добавление
-        if (userId > 0) {
-            // получаем элемент по id из бд
-            userCursor = db.rawQuery("select * from " + DBHelper.TABLE + " where " +
-                    DBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(userId)});
-            userCursor.moveToFirst();
-            textView.setText(userCursor.getString(2));
-            isFavorite = Boolean.parseBoolean(userCursor.getString(3));
+
+        if (Id > 0) {
+            cursor = db.rawQuery("select * from " + DBHelper.TABLE + " where " +
+                    DBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(Id)});
+            cursor.moveToFirst();
+            textView.setText(cursor.getString(2));
+            isFavorite = Boolean.parseBoolean(cursor.getString(3));
             starChange(isFavorite);
 
-            userCursor.close();
+            cursor.close();
         }
 
         star.setOnClickListener(new View.OnClickListener() {
@@ -81,8 +77,8 @@ public class ItemActivity extends AppCompatActivity {
             cv.put(DBHelper.COLUMN_FAVORITE, "false");
         }
 
-        if (userId > 0) {
-            db.update(DBHelper.TABLE, cv, DBHelper.COLUMN_ID + "=" + String.valueOf(userId), null);
+        if (Id > 0) {
+            db.update(DBHelper.TABLE, cv, DBHelper.COLUMN_ID + "=" + String.valueOf(Id), null);
         }
     }
 

@@ -29,13 +29,13 @@ import jk.freedws.study.db.DBHelper;
 
 public class FavoriteFragment extends Fragment {
 
-    ListView userList;
-    EditText userFilter;
+    ListView listView;
+    EditText filter;
     Context context;
     DBHelper sqlHelper;
     SQLiteDatabase db;
-    Cursor userCursor;
-    SimpleCursorAdapter userAdapter;
+    Cursor cursor;
+    SimpleCursorAdapter adapter;
 
     Parcelable state;
 
@@ -48,14 +48,14 @@ public class FavoriteFragment extends Fragment {
         title.setText("Избранное");
 
         context = getActivity().getApplicationContext();
-        userList = v.findViewById(R.id.fav__list);
-        userFilter = v.findViewById(R.id.searchElementFav);
+        listView = v.findViewById(R.id.fav__list);
+        filter = v.findViewById(R.id.searchElementFav);
 
         sqlHelper = new DBHelper(context);
-        // создаем базу данных
+
         sqlHelper.create_db();
 
-        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(context, ItemActivity.class);
@@ -69,7 +69,7 @@ public class FavoriteFragment extends Fragment {
 
     @Override
     public void onPause() {
-        state = userList.onSaveInstanceState();
+        state = listView.onSaveInstanceState();
         super.onPause();
     }
 
@@ -77,35 +77,34 @@ public class FavoriteFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(state != null) {
-            userList.onRestoreInstanceState(state);
+            listView.onRestoreInstanceState(state);
         }
 
         try {
             db = sqlHelper.open();
-            userCursor = db.rawQuery("select * from " + DBHelper.TABLE + " where "
+            cursor = db.rawQuery("select * from " + DBHelper.TABLE + " where "
                     + DBHelper.COLUMN_FAVORITE + "= ?", new String[] {"true"});
             String[] headers = new String[]{DBHelper.COLUMN_NAME};
-            userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
-                    userCursor, headers, new int[]{android.R.id.text1}, 0);
+            adapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
+                    cursor, headers, new int[]{android.R.id.text1}, 0);
 
-            if(!userFilter.getText().toString().isEmpty())
-                userAdapter.getFilter().filter(userFilter.getText().toString());
+            if(!filter.getText().toString().isEmpty())
+                adapter.getFilter().filter(filter.getText().toString());
 
-            // установка слушателя изменения текста
-            userFilter.addTextChangedListener(new TextWatcher() {
+            filter.addTextChangedListener(new TextWatcher() {
 
                 public void afterTextChanged(Editable s) { }
 
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-                // при изменении текста выполняем фильтрацию
+
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                    userAdapter.getFilter().filter(s.toString());
+                    adapter.getFilter().filter(s.toString());
                 }
             });
 
-            // устанавливаем провайдер фильтрации
-            userAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+
+            adapter.setFilterQueryProvider(new FilterQueryProvider() {
                 @Override
                 public Cursor runQuery(CharSequence constraint) {
 
@@ -121,20 +120,20 @@ public class FavoriteFragment extends Fragment {
                 }
             });
 
-            userList.setAdapter(userAdapter);
+            listView.setAdapter(adapter);
         }
         catch (SQLException ex){}
     }
 
     @Override
     public void onDestroy() {
-        state = userList.onSaveInstanceState();
+        state = listView.onSaveInstanceState();
         super.onDestroy();
         if (db != null) {
             db.close();
         }
-        if (userCursor != null) {
-            userCursor.close();
+        if (cursor != null) {
+            cursor.close();
         }
     }
 }

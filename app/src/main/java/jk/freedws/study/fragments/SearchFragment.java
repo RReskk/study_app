@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,14 +29,13 @@ import jk.freedws.study.db.DBHelper;
 
 public class SearchFragment extends Fragment {
 
-    ListView userList;
+    ListView listView;
     EditText searchElement;
     Context context;
     DBHelper dbHelper;
     SQLiteDatabase db;
-    Cursor userCursor;
-    SimpleCursorAdapter userAdapter;
-    Handler handler;
+    Cursor cursor;
+    SimpleCursorAdapter adapter;
 
     Parcelable state;
 
@@ -46,7 +44,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, container, false);
         context = getActivity().getApplicationContext();
-        userList = v.findViewById(R.id.search__list);
+        listView = v.findViewById(R.id.search__list);
 
         TextView title = getActivity().findViewById(R.id.actionbar_title);
         searchElement = v.findViewById(R.id.searchElement);
@@ -57,7 +55,7 @@ public class SearchFragment extends Fragment {
 
 
 
-        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(context, ItemActivity.class);
@@ -71,7 +69,7 @@ public class SearchFragment extends Fragment {
 
     @Override
     public void onPause() {
-        state = userList.onSaveInstanceState();
+        state = listView.onSaveInstanceState();
         super.onPause();
     }
 
@@ -79,34 +77,29 @@ public class SearchFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(state != null) {
-            userList.onRestoreInstanceState(state);
+            listView.onRestoreInstanceState(state);
         }
         try {
             db = dbHelper.open();
             String[] headers = new String[]{DBHelper.COLUMN_NAME};
-            userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
-                    userCursor, headers, new int[]{android.R.id.text1}, 0);
+            adapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
+                    cursor, headers, new int[]{android.R.id.text1}, 0);
 
-            // если в текстовом поле есть текст, выполняем фильтрацию
-            // данная проверка нужна при переходе от одной ориентации экрана к другой
             if(!searchElement.getText().toString().isEmpty())
-                userAdapter.getFilter().filter(searchElement.getText().toString());
+                adapter.getFilter().filter(searchElement.getText().toString());
 
-            // установка слушателя изменения текста
             searchElement.addTextChangedListener(new TextWatcher() {
 
                 public void afterTextChanged(Editable s) { }
 
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-                // при изменении текста выполняем фильтрацию
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                    userAdapter.getFilter().filter(s.toString());
+                    adapter.getFilter().filter(s.toString());
                 }
             });
 
-            // устанавливаем провайдер фильтрации
-            userAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            adapter.setFilterQueryProvider(new FilterQueryProvider() {
                 @Override
                 public Cursor runQuery(CharSequence constraint) {
 
@@ -120,7 +113,7 @@ public class SearchFragment extends Fragment {
                 }
             });
 
-            userList.setAdapter(userAdapter);
+            listView.setAdapter(adapter);
         }
         catch (SQLException ex){}
     }
@@ -128,13 +121,13 @@ public class SearchFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        state = userList.onSaveInstanceState();
+        state = listView.onSaveInstanceState();
         super.onDestroy();
         if (db != null) {
             db.close();
         }
-        if (userCursor != null) {
-            userCursor.close();
+        if (cursor != null) {
+            cursor.close();
         }
     }
 }
