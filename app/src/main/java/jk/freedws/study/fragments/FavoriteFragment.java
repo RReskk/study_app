@@ -88,8 +88,6 @@ public class FavoriteFragment extends Fragment {
             userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
                     userCursor, headers, new int[]{android.R.id.text1}, 0);
 
-            // если в текстовом поле есть текст, выполняем фильтрацию
-            // данная проверка нужна при переходе от одной ориентации экрана к другой
             if(!userFilter.getText().toString().isEmpty())
                 userAdapter.getFilter().filter(userFilter.getText().toString());
 
@@ -118,7 +116,7 @@ public class FavoriteFragment extends Fragment {
                     }
                     else {
                         return db.rawQuery("select * from " + DBHelper.TABLE + " where " +
-                                DBHelper.COLUMN_NAME + " like ?", new String[]{"%" + constraint.toString() + "%"});
+                                DBHelper.COLUMN_NAME + " like ? and " + DBHelper.COLUMN_FAVORITE + " = ?", new String[]{"%" + constraint.toString() + "%", "true"});
                     }
                 }
             });

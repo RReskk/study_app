@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import jk.freedws.study.db.DBHelper;
 
@@ -23,6 +24,7 @@ public class ItemActivity extends AppCompatActivity {
     SQLiteDatabase db;
     Cursor userCursor;
     long userId=0;
+    Boolean isFavorite;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +47,8 @@ public class ItemActivity extends AppCompatActivity {
                     DBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(userId)});
             userCursor.moveToFirst();
             textView.setText(userCursor.getString(2));
-
-            starChange(userCursor.getString(3));
+            isFavorite = Boolean.parseBoolean(userCursor.getString(3));
+            starChange(isFavorite);
 
             userCursor.close();
         }
@@ -59,8 +61,8 @@ public class ItemActivity extends AppCompatActivity {
         });
     }
 
-    private void starChange(String isTrue) {
-        if (isTrue == "true") {
+    private void starChange(Boolean isTrue) {
+        if (isTrue) {
             star.setImageResource(R.drawable.ic_baseline_star_24);
         } else {
             star.setImageResource(R.drawable.ic_baseline_star_border_24);
@@ -68,24 +70,18 @@ public class ItemActivity extends AppCompatActivity {
     }
 
     public void addFav(){
-//        if (!db.isOpen())
-//            db = sqlHelper.open();
-//
-//        ContentValues cv = new ContentValues();
-//
-//        if (userCursor.getString(3) == "true") {
-//            cv.put(DBHelper.COLUMN_FAVORITE, "false");
-//            starChange("false");
-//        } else {
-//            cv.put(DBHelper.COLUMN_FAVORITE, "true");
-//            starChange("true");
-//        }
-//
-//        if (userId > 0) {
-//            db.update(DBHelper.TABLE, cv, DBHelper.COLUMN_ID + "=" + userId, null);
-//        }
-//
-//        db.close();
+        ContentValues cv = new ContentValues();
+        if (isFavorite == false) {
+            starChange(true);
+            cv.put(DBHelper.COLUMN_FAVORITE, "true");
+        } else {
+            starChange(false);
+            cv.put(DBHelper.COLUMN_FAVORITE, "false");
+        }
+
+        if (userId > 0) {
+            db.update(DBHelper.TABLE, cv, DBHelper.COLUMN_ID + "=" + String.valueOf(userId), null);
+        }
     }
 
     private void changeActionBar() {
