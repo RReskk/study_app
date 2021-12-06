@@ -1,28 +1,19 @@
 package jk.freedws.study;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,14 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
         KeyboardVisibilityEvent.setEventListener(
                 this,
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        if(isOpen){
-                            bottomNavigationView.setVisibility(View.INVISIBLE);
-                        }else{
-                            bottomNavigationView.setVisibility(View.VISIBLE);
-                        }
+                isOpen -> {
+                    if(isOpen){
+                        bottomNavigationView.setVisibility(View.INVISIBLE);
+                    }else{
+                        bottomNavigationView.setVisibility(View.VISIBLE);
                     }
                 });
     }
