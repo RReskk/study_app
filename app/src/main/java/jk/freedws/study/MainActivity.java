@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVisibilityChanged(boolean isOpen) {
                         if(isOpen){
-                            bottomNavigationView.setVisibility(View.INVISIBLE);
+                            bottomNavigationView.setVisibility(View.GONE);
                         }else{
                             bottomNavigationView.setVisibility(View.VISIBLE);
                         }
