@@ -37,7 +37,6 @@ public class SearchFragment extends Fragment {
     Cursor userCursor;
     SimpleCursorAdapter userAdapter;
 
-
     Parcelable state;
 
     @Override
@@ -51,6 +50,9 @@ public class SearchFragment extends Fragment {
         searchElement = v.findViewById(R.id.searchElement);
         title.setText("Поиск");
 
+        dbHelper = new DBHelper(context);
+        dbHelper.create_db();
+
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -58,66 +60,6 @@ public class SearchFragment extends Fragment {
                 intent.putExtra("id", id);
                 startActivity(intent);
             }
-        });
-
-        searchElement.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                dbHelper = new DBHelper(context);
-                dbHelper.create_db();
-                if (searchElement.getText().toString().length() != 0) {
-                    try {
-                        db = dbHelper.open();
-                        userCursor = db.rawQuery("select * from " + DBHelper.TABLE, null);
-                        String[] headers = new String[]{DBHelper.COLUMN_NAME};
-                        userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
-                                userCursor, headers, new int[]{android.R.id.text1}, 0);
-
-                        // если в текстовом поле есть текст, выполняем фильтрацию
-                        // данная проверка нужна при переходе от одной ориентации экрана к другой
-                        if(!searchElement.getText().toString().isEmpty())
-                            userAdapter.getFilter().filter(searchElement.getText().toString());
-
-                        // установка слушателя изменения текста
-                        searchElement.addTextChangedListener(new TextWatcher() {
-
-                            public void afterTextChanged(Editable s) { }
-
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-                            // при изменении текста выполняем фильтрацию
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                                userAdapter.getFilter().filter(s.toString());
-                            }
-                        });
-
-                        // устанавливаем провайдер фильтрации
-                        userAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-                            @Override
-                            public Cursor runQuery(CharSequence constraint) {
-
-                                if (constraint == null || constraint.length() == 0) {
-
-                                    return db.rawQuery(null, null);
-                                }
-                                else {
-                                    return db.rawQuery("select * from " + DBHelper.TABLE + " where " +
-                                            DBHelper.COLUMN_NAME + " like ? order by ?", new String[]{"%" + constraint.toString() + "%", "asc"});
-                                }
-                            }
-                        });
-
-                        userList.setAdapter(userAdapter);
-                    }
-                    catch (SQLException ex){}
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) { }
         });
 
         return v;
@@ -135,6 +77,55 @@ public class SearchFragment extends Fragment {
         if(state != null) {
             userList.onRestoreInstanceState(state);
         }
+        try {
+            db = dbHelper.open();
+            String[] headers = new String[]{DBHelper.COLUMN_NAME};
+            userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
+                    userCursor, headers, new int[]{android.R.id.text1}, 0);
+
+            // если в текстовом поле есть текст, выполняем фильтрацию
+            // данная проверка нужна при переходе от одной ориентации экрана к другой
+            if(!searchElement.getText().toString().isEmpty())
+                userAdapter.getFilter().filter(searchElement.getText().toString());
+
+            // установка слушателя изменения текста
+            searchElement.addTextChangedListener(new TextWatcher() {
+
+                public void afterTextChanged(Editable s) { }
+
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                // при изменении текста выполняем фильтрацию
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    userAdapter.getFilter().filter(s.toString());
+                }
+            });
+
+            // устанавливаем провайдер фильтрации
+            userAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+                @Override
+                public Cursor runQuery(CharSequence constraint) {
+
+                    if (constraint == null || constraint.length() == 0) {
+                        if (db != null) {
+                            db.close();
+                        }
+                        if (userCursor != null) {
+                            userCursor.close();
+                        }
+
+                        return db.rawQuery("select * from " + DBHelper.TABLE, new String[]{"null"});
+                    }
+                    else {
+                        return db.rawQuery("select * from " + DBHelper.TABLE + " where " +
+                                DBHelper.COLUMN_NAME + " like ? order by ?", new String[]{"%" + constraint.toString() + "%", "asc"});
+                    }
+                }
+            });
+
+            userList.setAdapter(userAdapter);
+        }
+        catch (SQLException ex){}
     }
 
     @Override
