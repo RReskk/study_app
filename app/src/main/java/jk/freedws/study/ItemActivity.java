@@ -73,9 +73,11 @@ public class ItemActivity extends AppCompatActivity {
         ContentValues cv = new ContentValues();
         if (isFavorite == false) {
             starChange(true);
+            isFavorite = true;
             cv.put(DBHelper.COLUMN_FAVORITE, "true");
         } else {
             starChange(false);
+            isFavorite = false;
             cv.put(DBHelper.COLUMN_FAVORITE, "false");
         }
 
