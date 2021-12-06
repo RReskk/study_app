@@ -34,19 +34,12 @@ public class MainFragment extends Fragment {
 
     Parcelable state;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if(state != null) {
-            userList.onRestoreInstanceState(state);
-        }
-
-
         TextView title = getActivity().findViewById(R.id.actionbar_title);
         title.setText("Обществознание");
-
 
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         context = getActivity().getApplicationContext();
@@ -57,16 +50,20 @@ public class MainFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(context, ItemActivity.class);
                 intent.putExtra("id", id);
-                state = userList.onSaveInstanceState();
                 startActivity(intent);
             }
         });
 
         dbHelper = new DBHelper(context);
-
         dbHelper.create_db();
 
         return v;
+    }
+
+    @Override
+    public void onPause() {
+        state = userList.onSaveInstanceState();
+        super.onPause();
     }
 
     @Override
@@ -76,8 +73,9 @@ public class MainFragment extends Fragment {
         userCursor = db.rawQuery("select * from " + DBHelper.TABLE, null);
         String[] headers = new String[]{DBHelper.COLUMN_NAME};
         userAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1,
-                userCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+                userCursor, headers, new int[]{android.R.id.text1}, 0);
         userList.setAdapter(userAdapter);
+
         if(state != null) {
             userList.onRestoreInstanceState(state);
         }
@@ -86,8 +84,13 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        state = userList.onSaveInstanceState();
         super.onDestroy();
-        db.close();
-        userCursor.close();
+        if (db != null) {
+            db.close();
+        }
+        if (userCursor != null) {
+            userCursor.close();
+        }
     }
 }
